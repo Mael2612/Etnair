@@ -1,0 +1,31 @@
+{
+    "SEO": {
+        "homepage": {
+            "title": "Home",
+            "description": "Welcome to Etnair"
+        }
+    },
+    "homepage": {
+        "subtitle": "Find your perfect property",
+        "bottomButton": "Explore"
+    },
+    "authpage": {
+    "title": {
+        "signIn": "Welcome Back",
+        "signUp": "Create Your Account"
+    },
+    "placeholder": {
+        "password": "Password",
+        "vPassword": "Confirm Password"
+    },
+    "submitButton": {
+        "signIn": "Sign In",
+        "signUp": "Sign Up"
+    },
+    "pagelinks": {
+        "signIn": "Don't have an account? Sign up",
+        "signUp": "Already have an account? Sign in"
+    }
+}
+
+}

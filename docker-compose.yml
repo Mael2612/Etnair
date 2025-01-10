@@ -1,0 +1,91 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_etnair
+    env_file:
+      - .env
+    volumes:
+      - etnair_db_data:/var/lib/postgresql/data
+    networks:
+      - etnair_network
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_etnair
+    env_file:
+      - .env
+    ports:
+      - "8082:82"
+    networks:
+      - etnair_network
+
+  prisma-migrations:
+    image: etnair-prisma-image
+    build:
+      context: ./api
+      dockerfile: ./configs/docker/Dockerfile.migrations
+    container_name: etnair-prisma
+    env_file:
+      - ./api/configs/env/.env.production
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - etnair_network
+
+  api:
+    image: etnair-api-image
+    build:
+      context: ./api
+      dockerfile: ./configs/docker/Dockerfile.api
+    container_name: etnair-api
+    restart: always
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./api/configs/env/.env.production
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      prisma-migrations:
+        condition: service_completed_successfully
+    networks:
+      - etnair_network
+
+  client:
+    image: etnair-client-image
+    build:
+      context: ./client
+      dockerfile: ./configs/docker/Dockerfile.client
+    container_name: etnair-client
+    restart: always
+    env_file:
+      - ./client/configs/env/.env.production
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_started
+    networks:
+      - etnair_network
+
+
+networks:
+  etnair_network:
+    name: etnair_network
+    driver: bridge
+
+volumes:
+  etnair_db_data:
+    driver: local

@@ -1,0 +1,23 @@
+model Wishlist {
+  id                    String                @id @default(uuid())
+  name                  String             
+  userId                String 
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  // RELATIONS
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property              WishlistProperty[]
+
+  @@unique([name, userId])
+  @@index([userId])
+}
+
+model WishlistProperty {
+  wishlistId String
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+
+  @@id([wishlistId, propertyId])
+}
